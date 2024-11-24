@@ -199,8 +199,8 @@ export function Especialidad() {
                     <table className="w-full min-w-[640px] table-auto">
                         <thead>
                             <tr>
-                                {["id", "Nombre", "Descripcion", "Estado", "", ""].map((el) => (
-                                    <th key={el} className="py-3 px-5 text-left">
+                                {["id", "Nombre", "Descripcion", "Estado", "", ""].map((el, index) => (
+                                    <th key={index} className="py-3 px-5 text-left">
                                         <Typography variant="small" color="blue-gray" className="font-bold uppercase">
                                             {el}
                                         </Typography>

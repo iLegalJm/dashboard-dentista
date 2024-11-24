@@ -21,49 +21,48 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import usePost from "@/hooks/usePost";
 import Swal from "sweetalert2";
 
-export function Doctor() {
-
+export function Cita() {
     const [refresh, setRefresh] = useState(false);
-    const { data: doctores, loading, error } = useFetch(`http://localhost:8080/doctor/v1/api?refresh=${refresh}`);
+    const { data: citas, loading, error } = useFetch(`http://localhost:8080/cita/v1/api?refresh=${refresh}`);
+    const { postData, loading: postLoading, error: postError } = usePost('http://localhost:8080/cita/v1/api');
+    const { postData: putData, loading: putLoading, error: putError } = usePost('http://localhost:8080/cita/v1/api', 'PUT');
     const { data: especialidades, loading: especialidadesLoading, error: especialidadesError } = useFetch('http://localhost:8080/especialidad/v1/api');
-    const { postData, loading: postLoading, error: postError } = usePost('http://localhost:8080/doctor/v1/api');
-    const { postData: putData, loading: putLoading, error: putError } = usePost('http://localhost:8080/doctor/v1/api', 'PUT');
 
     const [open, setOpen] = useState(false);
-    const [newDoctor, setNewDoctor] = useState({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+    const [newCita, setNewCita] = useState({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
     const [isEditing, setIsEditing] = useState(false);
-    const [currentDoctor, setCurrentDoctor] = useState(null);
+    const [currentCita, setCurrentCita] = useState(null);
 
     const handleOpen = () => setOpen(!open);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setNewDoctor({ ...newDoctor, [name]: value });
+        setNewCita({ ...newCita, [name]: value });
     };
 
     const handleSelectChange = (e) => {
-        setNewDoctor({ ...newDoctor, especialidad: e });
+        setNewCita({ ...newCita, especialidad: e });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
 
-            const response = await postData(newDoctor);
+            const response = await postData(newCita);
             if (response.status === 200) {
                 Swal.fire({
-                    title: 'Doctor creado',
-                    text: 'Doctor creado correctamente',
+                    title: 'Cita creado',
+                    text: 'Cita creado correctamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
                 handleOpen();
-                setNewDoctor({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+                setNewCita({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
                 setRefresh(!refresh);
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'Error al crear el doctor',
+                    text: 'Error al crear el Cita',
                     icon: 'error',
                     confirmButtonText: 'Aceptar'
                 });
@@ -78,17 +77,17 @@ export function Doctor() {
         }
     };
 
-    const handleEdit = (doctor) => {
+    const handleEdit = (Cita) => {
         setIsEditing(true);
-        setCurrentDoctor(doctor);
-        setNewDoctor({
-            nombre: doctor.persona.nombre,
-            apellidos: doctor.persona.apellidos,
-            dni: doctor.persona.dni,
-            direccion: doctor.persona.direccion,
-            telefono: doctor.persona.telefono,
-            email: doctor.persona.email,
-            especialidad: doctor.especialidad.id
+        setCurrentCita(Cita);
+        setNewCita({
+            nombre: Cita.persona.nombre,
+            apellidos: Cita.persona.apellidos,
+            dni: Cita.persona.dni,
+            direccion: Cita.persona.direccion,
+            telefono: Cita.persona.telefono,
+            email: Cita.persona.email,
+            especialidad: Cita.especialidad.id
         });
         setOpen(true);
     };
@@ -96,23 +95,23 @@ export function Doctor() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await putData(newDoctor, `http://localhost:8080/doctor/v1/api/${currentDoctor.id}`);
+            const response = await putData(newCita, `http://localhost:8080/Cita/v1/api/${currentCita.id}`);
             if (response.status === 200) {
                 Swal.fire({
-                    title: 'Doctor actualizado',
-                    text: 'Doctor actualizado correctamente',
+                    title: 'Cita actualizado',
+                    text: 'Cita actualizado correctamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
                 handleOpen();
                 setRefresh(!refresh);
-                setNewDoctor({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+                setNewCita({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
                 setIsEditing(false);
-                setCurrentDoctor(null);
+                setCurrentCita(null);
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'Error al actualizar el doctor',
+                    text: 'Error al actualizar el Cita',
                     icon: 'error',
                     confirmButtonText: 'Aceptar'
                 });
@@ -126,7 +125,7 @@ export function Doctor() {
             console.error('Error updating data:', error);
         }
     };
-    const handleDelete = async (id) => {        
+    const handleDelete = async (id) => {
         Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás revertir esto!",
@@ -138,13 +137,13 @@ export function Doctor() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch(`http://localhost:8080/doctor/v1/api/${id}`, {
+                    const response = await fetch(`http://localhost:8080/cita/v1/api/${id}`, {
                         method: 'DELETE',
                     });
                     if (response.ok) {
                         Swal.fire(
                             'Eliminado!',
-                            'El doctor ha sido eliminado.',
+                            'El Cita ha sido eliminado.',
                             'success',
                             '1500'
                         );
@@ -152,14 +151,14 @@ export function Doctor() {
                     } else {
                         Swal.fire(
                             'Error!',
-                            'Hubo un problema al eliminar el doctor.',
+                            'Hubo un problema al eliminar el Cita.',
                             'error'
                         );
                     }
                 } catch (error) {
                     Swal.fire(
                         'Error!',
-                        'Hubo un problema al eliminar el doctor.',
+                        'Hubo un problema al eliminar el Cita.',
                         'error'
                     );
                     console.error('Error deleting data:', error);
@@ -176,17 +175,17 @@ export function Doctor() {
             <Card>
                 <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
                     <Typography variant="h6" color="white">
-                        Lista de Doctores
+                        Lista de Citas
                     </Typography>
-                    <Button onClick={handleOpen} className="bg-green-500">
+                    {/* <Button onClick={handleOpen} className="bg-green-500">
                         Agregar
-                    </Button>
+                    </Button> */}
                 </CardHeader>
                 <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
                     <table className="w-full min-w-[640px] table-auto">
                         <thead>
                             <tr>
-                                {["Nombre", "Especialidad", "DNI", "Dirección", "Télefono", "Estado", "", ""].map((el, index) => (
+                                {["Paciente", "Doctor", "Serie", "Numero", "Fecha", "Motivo", "Estado","", ""].map((el, index) => (
                                     <th key={index} className="py-3 px-5 text-left bg-gray-100">
                                         <Typography variant="small" color="blue-gray" className="font-bold uppercase">
                                             {el}
@@ -196,8 +195,8 @@ export function Doctor() {
                             </tr>
                         </thead>
                         <tbody>
-                            {doctores.map(({ id, persona, especialidad, flag_estado }) => {
-                                const className = `py-3 px-5 ${id === doctores.length - 1
+                            {citas.map(({ id, paciente, doctor, serie, numero, motivo, fecha, flag_estado }) => {
+                                const className = `py-3 px-5 ${id === citas.length - 1
                                     ? ""
                                     : "border-b border-blue-gray-50"
                                     }`;
@@ -206,42 +205,47 @@ export function Doctor() {
                                     <tr key={id}>
                                         <td className={className}>
                                             <div className="flex items-center gap-4">
-                                                <Avatar src={"/img/team-1.jpeg"} alt={persona.nombre} size="sm" variant="rounded" />
                                                 <div>
                                                     <Typography
                                                         variant="small"
                                                         color="blue-gray"
                                                         className="font-semibold"
                                                     >
-                                                        {persona.nombre + " " + persona.apellidos}
+                                                        {paciente.persona.nombre + " " + paciente.persona.apellidos}
                                                     </Typography>
-                                                    <Typography className="text-xs font-normal text-blue-gray-500">
+                                                    {/* <Typography className="text-xs font-normal text-blue-gray-500">
                                                         {persona.email}
-                                                    </Typography>
+                                                    </Typography> */}
                                                 </div>
                                             </div>
                                         </td>
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {especialidad.nombre}
+                                                {doctor.persona.nombre + " " + doctor.persona.apellidos}
                                             </Typography>
                                             <Typography className="text-xs font-normal text-blue-gray-500">
-                                                {especialidad.descripcion}
+                                                {doctor.especialidad.nombre}
                                             </Typography>
                                         </td>
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {persona.dni}
+                                                {serie}
                                             </Typography>
                                         </td>
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {persona.direccion}
+                                                {numero}
                                             </Typography>
                                         </td>
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
-                                                {persona.telefono}
+                                                {/* formatea fecha y hora */}
+                                                {new Date(fecha).toLocaleString()}
+                                            </Typography>
+                                        </td>
+                                        <td className={className}>
+                                            <Typography className="text-xs font-semibold text-blue-gray-600">
+                                                {motivo}
                                             </Typography>
                                         </td>
                                         <td className={className}>
@@ -258,7 +262,7 @@ export function Doctor() {
                                                 href="#"
                                                 className="text-xs font-semibold text-blue-gray-600"
                                             >
-                                                <IconButton onClick={() => handleEdit({ id, persona, especialidad, flag_estado })}>
+                                                <IconButton onClick={() => handleEdit({ id, paciente, doctor, flag_estado })}>
                                                     <PencilIcon className="h-5 w-5" />
                                                 </IconButton>
                                             </Typography>
@@ -284,14 +288,14 @@ export function Doctor() {
             </Card>
 
             <Dialog open={open} handler={handleOpen}>
-                <DialogHeader>{isEditing ? 'Editar Doctor' : 'Agregar Nuevo Doctor'}</DialogHeader>
+                <DialogHeader>{isEditing ? 'Editar Cita' : 'Agregar Nuevo Cita'}</DialogHeader>
                 <DialogBody>
                     <form onSubmit={isEditing ? handleUpdate : handleSubmit}>
                         <div className="mb-4">
                             <Input
                                 label="Nombre"
                                 name="nombre"
-                                value={newDoctor.nombre}
+                                value={newCita.nombre}
                                 onChange={handleChange}
                                 required
                             />
@@ -300,7 +304,7 @@ export function Doctor() {
                             <Input
                                 label="Apellidos"
                                 name="apellidos"
-                                value={newDoctor.apellidos}
+                                value={newCita.apellidos}
                                 onChange={handleChange}
                                 required
                             />
@@ -309,7 +313,7 @@ export function Doctor() {
                             <Input
                                 label="DNI"
                                 name="dni"
-                                value={newDoctor.dni}
+                                value={newCita.dni}
                                 onChange={handleChange}
                                 maxLength={8}
                                 required
@@ -319,7 +323,7 @@ export function Doctor() {
                             <Input
                                 label="Dirección"
                                 name="direccion"
-                                value={newDoctor.direccion}
+                                value={newCita.direccion}
                                 onChange={handleChange}
                                 required
                             />
@@ -328,7 +332,7 @@ export function Doctor() {
                             <Input
                                 label="Teléfono"
                                 name="telefono"
-                                value={newDoctor.telefono}
+                                value={newCita.telefono}
                                 onChange={handleChange}
                                 required
                                 maxLength={9}
@@ -339,25 +343,12 @@ export function Doctor() {
                             <Input
                                 label="Email"
                                 name="email"
-                                value={newDoctor.email}
+                                value={newCita.email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <Select
-                                label="Especialidad"
-                                name="especialidad"
-                                value={newDoctor.especialidad}
-                                onChange={(e) => handleSelectChange(e)}
-                                required
-                            >
-                                {especialidades.map((especialidad) => (
-                                    <Option key={especialidad.id} value={especialidad.id}>
-                                        {especialidad.nombre}
-                                    </Option>
-                                ))}
-                            </Select>
                         </div>
                         <DialogFooter>
                             <Button variant="text" color="red" onClick={handleOpen}>
@@ -483,4 +474,4 @@ export function Doctor() {
     );
 }
 
-export default Doctor;
+export default Cita;

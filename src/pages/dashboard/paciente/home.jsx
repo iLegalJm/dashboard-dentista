@@ -21,49 +21,44 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import usePost from "@/hooks/usePost";
 import Swal from "sweetalert2";
 
-export function Doctor() {
-
+export function Paciente() {
     const [refresh, setRefresh] = useState(false);
-    const { data: doctores, loading, error } = useFetch(`http://localhost:8080/doctor/v1/api?refresh=${refresh}`);
-    const { data: especialidades, loading: especialidadesLoading, error: especialidadesError } = useFetch('http://localhost:8080/especialidad/v1/api');
-    const { postData, loading: postLoading, error: postError } = usePost('http://localhost:8080/doctor/v1/api');
-    const { postData: putData, loading: putLoading, error: putError } = usePost('http://localhost:8080/doctor/v1/api', 'PUT');
+    const { data: pacientes, loading, error } = useFetch(`http://localhost:8080/paciente/v1/api?refresh=${refresh}`);
+
+    const { postData, loading: postLoading, error: postError } = usePost('http://localhost:8080/paciente/v1/api');
+    const { postData: putData, loading: putLoading, error: putError } = usePost('http://localhost:8080/paciente/v1/api', 'PUT');
 
     const [open, setOpen] = useState(false);
-    const [newDoctor, setNewDoctor] = useState({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+    const [newPaciente, setNewPaciente] = useState({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
     const [isEditing, setIsEditing] = useState(false);
-    const [currentDoctor, setCurrentDoctor] = useState(null);
+    const [currentPaciente, setCurrentPaciente] = useState(null);
 
     const handleOpen = () => setOpen(!open);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setNewDoctor({ ...newDoctor, [name]: value });
-    };
-
-    const handleSelectChange = (e) => {
-        setNewDoctor({ ...newDoctor, especialidad: e });
+        setNewPaciente({ ...newPaciente, [name]: value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
 
-            const response = await postData(newDoctor);
-            if (response.status === 200) {
+            const response = await postData(newPaciente);
+            if (response.status === 201) {
                 Swal.fire({
-                    title: 'Doctor creado',
-                    text: 'Doctor creado correctamente',
+                    title: 'Paciente creado',
+                    text: 'Paciente creado correctamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
                 handleOpen();
-                setNewDoctor({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+                setNewPaciente({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '' });
                 setRefresh(!refresh);
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'Error al crear el doctor',
+                    text: 'Error al crear el Paciente',
                     icon: 'error',
                     confirmButtonText: 'Aceptar'
                 });
@@ -78,17 +73,16 @@ export function Doctor() {
         }
     };
 
-    const handleEdit = (doctor) => {
+    const handleEdit = (Paciente) => {
         setIsEditing(true);
-        setCurrentDoctor(doctor);
-        setNewDoctor({
-            nombre: doctor.persona.nombre,
-            apellidos: doctor.persona.apellidos,
-            dni: doctor.persona.dni,
-            direccion: doctor.persona.direccion,
-            telefono: doctor.persona.telefono,
-            email: doctor.persona.email,
-            especialidad: doctor.especialidad.id
+        setCurrentPaciente(Paciente);
+        setNewPaciente({
+            nombre: Paciente.persona.nombre,
+            apellidos: Paciente.persona.apellidos,
+            dni: Paciente.persona.dni,
+            direccion: Paciente.persona.direccion,
+            telefono: Paciente.persona.telefono,
+            email: Paciente.persona.email,
         });
         setOpen(true);
     };
@@ -96,23 +90,23 @@ export function Doctor() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await putData(newDoctor, `http://localhost:8080/doctor/v1/api/${currentDoctor.id}`);
+            const response = await putData(newPaciente, `http://localhost:8080/paciente/v1/api/${currentPaciente.id}`);
             if (response.status === 200) {
                 Swal.fire({
-                    title: 'Doctor actualizado',
-                    text: 'Doctor actualizado correctamente',
+                    title: 'Paciente actualizado',
+                    text: 'Paciente actualizado correctamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
                 handleOpen();
                 setRefresh(!refresh);
-                setNewDoctor({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '', especialidad: '' });
+                setNewPaciente({ nombre: '', apellidos: '', dni: '', direccion: '', telefono: '', email: '' });
                 setIsEditing(false);
-                setCurrentDoctor(null);
+                setCurrentPaciente(null);
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'Error al actualizar el doctor',
+                    text: 'Error al actualizar el Paciente',
                     icon: 'error',
                     confirmButtonText: 'Aceptar'
                 });
@@ -126,7 +120,7 @@ export function Doctor() {
             console.error('Error updating data:', error);
         }
     };
-    const handleDelete = async (id) => {        
+    const handleDelete = async (id) => {
         Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás revertir esto!",
@@ -138,13 +132,13 @@ export function Doctor() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch(`http://localhost:8080/doctor/v1/api/${id}`, {
+                    const response = await fetch(`http://localhost:8080/paciente/v1/api/${id}`, {
                         method: 'DELETE',
                     });
                     if (response.ok) {
                         Swal.fire(
                             'Eliminado!',
-                            'El doctor ha sido eliminado.',
+                            'El Paciente ha sido eliminado.',
                             'success',
                             '1500'
                         );
@@ -152,14 +146,14 @@ export function Doctor() {
                     } else {
                         Swal.fire(
                             'Error!',
-                            'Hubo un problema al eliminar el doctor.',
+                            'Hubo un problema al eliminar el Paciente.',
                             'error'
                         );
                     }
                 } catch (error) {
                     Swal.fire(
                         'Error!',
-                        'Hubo un problema al eliminar el doctor.',
+                        'Hubo un problema al eliminar el Paciente.',
                         'error'
                     );
                     console.error('Error deleting data:', error);
@@ -176,7 +170,7 @@ export function Doctor() {
             <Card>
                 <CardHeader variant="gradient" color="gray" className="mb-8 p-6 flex justify-between items-center">
                     <Typography variant="h6" color="white">
-                        Lista de Doctores
+                        Lista de pacientes
                     </Typography>
                     <Button onClick={handleOpen} className="bg-green-500">
                         Agregar
@@ -186,7 +180,7 @@ export function Doctor() {
                     <table className="w-full min-w-[640px] table-auto">
                         <thead>
                             <tr>
-                                {["Nombre", "Especialidad", "DNI", "Dirección", "Télefono", "Estado", "", ""].map((el, index) => (
+                                {["Nombre", "DNI", "Dirección", "Télefono", "Estado", "", ""].map((el, index) => (
                                     <th key={index} className="py-3 px-5 text-left bg-gray-100">
                                         <Typography variant="small" color="blue-gray" className="font-bold uppercase">
                                             {el}
@@ -196,8 +190,8 @@ export function Doctor() {
                             </tr>
                         </thead>
                         <tbody>
-                            {doctores.map(({ id, persona, especialidad, flag_estado }) => {
-                                const className = `py-3 px-5 ${id === doctores.length - 1
+                            {pacientes.map(({ id, persona, flag_estado }) => {
+                                const className = `py-3 px-5 ${id === pacientes.length - 1
                                     ? ""
                                     : "border-b border-blue-gray-50"
                                     }`;
@@ -221,14 +215,14 @@ export function Doctor() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className={className}>
+                                        {/* <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
                                                 {especialidad.nombre}
                                             </Typography>
                                             <Typography className="text-xs font-normal text-blue-gray-500">
                                                 {especialidad.descripcion}
                                             </Typography>
-                                        </td>
+                                        </td> */}
                                         <td className={className}>
                                             <Typography className="text-xs font-semibold text-blue-gray-600">
                                                 {persona.dni}
@@ -258,7 +252,7 @@ export function Doctor() {
                                                 href="#"
                                                 className="text-xs font-semibold text-blue-gray-600"
                                             >
-                                                <IconButton onClick={() => handleEdit({ id, persona, especialidad, flag_estado })}>
+                                                <IconButton onClick={() => handleEdit({ id, persona, flag_estado })}>
                                                     <PencilIcon className="h-5 w-5" />
                                                 </IconButton>
                                             </Typography>
@@ -284,14 +278,14 @@ export function Doctor() {
             </Card>
 
             <Dialog open={open} handler={handleOpen}>
-                <DialogHeader>{isEditing ? 'Editar Doctor' : 'Agregar Nuevo Doctor'}</DialogHeader>
+                <DialogHeader>{isEditing ? 'Editar Paciente' : 'Agregar Nuevo Paciente'}</DialogHeader>
                 <DialogBody>
                     <form onSubmit={isEditing ? handleUpdate : handleSubmit}>
                         <div className="mb-4">
                             <Input
                                 label="Nombre"
                                 name="nombre"
-                                value={newDoctor.nombre}
+                                value={newPaciente.nombre}
                                 onChange={handleChange}
                                 required
                             />
@@ -300,7 +294,7 @@ export function Doctor() {
                             <Input
                                 label="Apellidos"
                                 name="apellidos"
-                                value={newDoctor.apellidos}
+                                value={newPaciente.apellidos}
                                 onChange={handleChange}
                                 required
                             />
@@ -309,7 +303,7 @@ export function Doctor() {
                             <Input
                                 label="DNI"
                                 name="dni"
-                                value={newDoctor.dni}
+                                value={newPaciente.dni}
                                 onChange={handleChange}
                                 maxLength={8}
                                 required
@@ -319,7 +313,7 @@ export function Doctor() {
                             <Input
                                 label="Dirección"
                                 name="direccion"
-                                value={newDoctor.direccion}
+                                value={newPaciente.direccion}
                                 onChange={handleChange}
                                 required
                             />
@@ -328,7 +322,7 @@ export function Doctor() {
                             <Input
                                 label="Teléfono"
                                 name="telefono"
-                                value={newDoctor.telefono}
+                                value={newPaciente.telefono}
                                 onChange={handleChange}
                                 required
                                 maxLength={9}
@@ -339,25 +333,10 @@ export function Doctor() {
                             <Input
                                 label="Email"
                                 name="email"
-                                value={newDoctor.email}
+                                value={newPaciente.email}
                                 onChange={handleChange}
                                 required
                             />
-                        </div>
-                        <div className="mb-4">
-                            <Select
-                                label="Especialidad"
-                                name="especialidad"
-                                value={newDoctor.especialidad}
-                                onChange={(e) => handleSelectChange(e)}
-                                required
-                            >
-                                {especialidades.map((especialidad) => (
-                                    <Option key={especialidad.id} value={especialidad.id}>
-                                        {especialidad.nombre}
-                                    </Option>
-                                ))}
-                            </Select>
                         </div>
                         <DialogFooter>
                             <Button variant="text" color="red" onClick={handleOpen}>
@@ -483,4 +462,4 @@ export function Doctor() {
     );
 }
 
-export default Doctor;
+export default Paciente;
